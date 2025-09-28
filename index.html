@@ -35,12 +35,15 @@
     .meter{height:10px;background:var(--track);border:1px solid var(--outline);border-radius:999px;overflow:hidden}
     .bar{height:100%;width:0;background:linear-gradient(90deg,#78ffb3,#9dffea)}
 
-    .chase{position:relative;height:18px;border:1px solid var(--outline);background:#0d1a15;border-radius:999px;overflow:hidden;margin:10px 0}
-    .chase .you,.chase .zombies{position:absolute;top:0;height:100%;display:flex;align-items:center;justify-content:center;font-size:12px}
-    .chase .you{left:0;background:linear-gradient(90deg,#78ffb3,#9dffea);color:#052315;padding:0 8px}
-    .chase .zombies{right:0;background:linear-gradient(90deg,#3c5f52,#29604b);color:#c8f1e1;padding:0 8px}
-    .chase .track{position:absolute;inset:0}
-    .marker{position:absolute;top:0;transform:translateX(-50%);height:100%;width:2px;background:#7c9cff}
+    /* NEW: Zombie chase track where zombies approach you */
+    .chase{position:relative;height:52px;border:1px solid var(--outline);background:linear-gradient(180deg,#0c1713,#0a1410);border-radius:14px;overflow:hidden;margin:12px 0}
+    .chase .lane{position:absolute;inset:0;opacity:.25;background-image:repeating-linear-gradient(90deg,transparent 0 48px, rgba(120,255,179,.05) 48px 52px)}
+    .you-avatar, .zombie-avatar{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px}
+    .you-avatar{left:8px;background:linear-gradient(90deg,#78ffb3,#9dffea);color:#052315;font-weight:700}
+    .zombie-avatar{right:8px;background:linear-gradient(135deg,#2a3e35,#20352c);color:#c8f1e1;border:1px solid #244736}
+    .distance{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#b9d8c9;opacity:.9}
+    .horde{position:absolute;top:6px;bottom:6px;right:8px;display:flex;gap:4px;transition:transform .12s ease-out}
+    .z{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:radial-gradient(10px 10px at 40% 40%, #a1ff99, #6fd16a);box-shadow:0 0 12px rgba(140,255,122,.25)}
 
     .question{display:grid;gap:6px;margin-top:8px}
     .q-text{font-size:clamp(22px,4.5vw,30px);font-weight:900}
@@ -89,11 +92,15 @@
           <div class="hearts" id="hearts"></div>
         </div>
 
-        <div class="chase" aria-label="zombie chase meter">
-          <div class="track" id="chaseTrack"></div>
-          <div class="you" id="you" style="width:20%">🧪 You</div>
-          <div class="zombies" id="zeds" style="width:20%">🧟 Horde</div>
-          <div class="marker" id="meetPoint" style="left:50%"></div>
+        <!-- NEW CHASE BAR -->
+        <div class="chase" aria-label="zombies are chasing you">
+          <div class="lane"></div>
+          <div class="you-avatar">🧪 You</div>
+          <div class="horde" id="horde">
+            <div class="z">🧟</div><div class="z">🧟‍♀️</div><div class="z">🧟‍♂️</div>
+          </div>
+          <div class="zombie-avatar" id="zLabel">Horde</div>
+          <div class="distance" id="distText">Distance: 60%</div>
         </div>
 
         <div class="meter" aria-label="round timer"><div class="bar" id="timebar"></div></div>
@@ -122,9 +129,9 @@
         </div>
         <ol class="small" style="margin-top:8px;color:#b8d8c8">
           <li>Drag parts into slots to form the word that matches the meaning.</li>
-          <li>The <b>horde</b> chases you. Wrong builds/timeouts make it surge forward.</li>
-          <li>Clear <b>5 puzzles</b> to advance a wave. Higher waves = trickier parts & faster horde.</li>
-          <li>You have <b>3 hearts</b>. When the horde reaches you, you lose a heart.</li>
+          <li>The <b>horde</b> actually <em>moves toward you</em>. Correct answers push them back; wrong answers/timeout make them surge forward.</li>
+          <li>Clear <b>5 puzzles</b> to advance a wave. Higher waves = faster horde.</li>
+          <li>You have <b>3 hearts</b>. If the horde reaches you, you lose a heart.</li>
         </ol>
         <div class="row" style="margin-top:8px">
           <label class="pill">Start Time: <input id="timeStart" type="number" min="20" max="120" value="60" style="width:64px;margin-left:6px;background:transparent;border:none;color:#e4ffef"></label>
@@ -138,17 +145,15 @@
       </aside>
     </div>
 
-    <footer class="small">Single-file — save as <code>index.html</code> on GitHub Pages. Works offline.</footer>
+    <footer class="small">Single‑file — save as <code>index.html</code> on GitHub Pages. Works offline.</footer>
   </div>
 
   <script>
     /*****************************************
-     * ZOMBIE SURVIVAL – Build-a-Word
+     * ZOMBIE SURVIVAL – Build‑a‑Word
      *****************************************/
-    const HS_KEY='hs_zombie_build';
+    const HS_KEY='hs_zombie_build_v2';
 
-    // Expanded bank (easy/medium/hard). Keep items 7th-grade friendly.
-    // {parts:[...], meaning:'', hint:'', accept:[...], diff:'easy|medium|hard'}
     const BANK = [
       // EASY
       {parts:['bio','logy'], meaning:'study of life', hint:'root + suffix', accept:['biology'], diff:'easy'},
@@ -162,7 +167,6 @@
       {parts:['vis','ible'], meaning:'able to be seen', hint:'root + suffix', accept:['visible'], diff:'easy'},
       {parts:['re','write'], meaning:'write again', hint:'prefix + root', accept:['rewrite'], diff:'easy'},
       {parts:['un','fair'], meaning:'not fair', hint:'prefix + root', accept:['unfair'], diff:'easy'},
-      {parts:['un','friendly'], meaning:'not friendly', hint:'prefix + root', accept:['unfriendly','un-friendl y','un-f riendly'].map(s=>s.replace(/\s/g,'')), diff:'easy'},
       {parts:['anti','freeze'], meaning:'against freezing', hint:'prefix + root', accept:['antifreeze'], diff:'easy'},
       {parts:['dis','connect'], meaning:'separate; not connect', hint:'prefix + root', accept:['disconnect'], diff:'easy'},
       {parts:['non','sense'], meaning:'not making sense', hint:'prefix + root', accept:['nonsense'], diff:'easy'},
@@ -217,43 +221,44 @@
     let timeStart=60, timeLeft=60, timer=null;
     let choiceCount=8;
     let current=null;
-    let chase=0.5; // 0..1 meeting point
 
-    // Per-difficulty shuffled decks (arrays of BANK indexes)
+    // Distance between horde and player (percent of track). 100 = far away, 0 = caught.
+    let distance=60;
+
+    // Shuffled decks per difficulty
     const DECK = { easy:[], medium:[], hard:[] };
-
     function difficultyForWave(){ return wave<=2? 'easy' : wave<=4? 'medium' : 'hard'; }
-
-    function refillDeckFor(diff){
-      const idxs = BANK.map((b,i)=>[b.diff,i]).filter(([d])=>d===diff).map(([,i])=>i);
-      DECK[diff] = shuffle(idxs);
-    }
+    function refillDeckFor(diff){ const idxs=BANK.map((b,i)=>[b.diff,i]).filter(([d])=>d===diff).map(([,i])=>i); DECK[diff]=shuffle(idxs); }
     function refillAllDecks(){ ['easy','medium','hard'].forEach(refillDeckFor); }
+    function drawPuzzle(){ const diff=difficultyForWave(); if(!DECK[diff]||DECK[diff].length===0) refillDeckFor(diff); const idx=DECK[diff].shift(); return BANK[idx]; }
 
-    function drawPuzzle(){
-      const diff = difficultyForWave();
-      if(!DECK[diff] || DECK[diff].length===0) refillDeckFor(diff);
-      const idx = DECK[diff].shift();
-      return BANK[idx];
+    function renderHearts(){ const box=$('#hearts'); box.innerHTML=''; for(let i=0;i<3;i++){ const d=document.createElement('div'); d.className='heart'+(i<hearts?'':' dead'); box.appendChild(d);} }
+    function updateHUD(){ $('#score').textContent=score; $('#wave').textContent=wave; $('#best').textContent=localStorage.getItem(HS_KEY)||0; }
+
+    // --- Chase visuals ---
+    function renderChase(){
+      const horde=$('#horde'); const label=$('#zLabel'); const dist=$('#distText');
+      // Convert distance (0..100) to a horizontal transform of the horde group
+      // Max travel ≈ track width minus padding ~ we simulate with % translate.
+      // At 100% distance, horde hugs the right. At 0%, it reaches the left (you).
+      const pct = Math.max(0, Math.min(100, distance));
+      const translatePct = 100 - pct; // 0 when far, 100 when caught -> move left
+      horde.style.transform = `translateX(-${translatePct}%)`;
+      label.style.transform = `translateX(-${translatePct}%)`;
+      dist.textContent = `Distance: ${Math.round(pct)}%`;
     }
 
-    function renderHearts(){
-      const box=$('#hearts'); box.innerHTML='';
-      for(let i=0;i<3;i++){
-        const d=document.createElement('div');
-        d.className='heart'+(i<hearts?'':' dead');
-        box.appendChild(d);
-      }
-    }
+    function baseDrift(){ return 0.06 + (wave-1)*0.02; } // higher waves = faster approach
+    function pushBack(amount){ distance = Math.min(100, distance + amount); renderChase(); }
+    function surgeForward(amount){ distance = Math.max(0, distance - amount); renderChase(); if(distance<=0) loseHeart(); }
 
     function startTimer(){
       clearInterval(timer);
       const bar=$('#timebar');
-      timeLeft = Math.max(20, timeStart - (wave-1)*5);
-      const total=timeLeft;
+      timeLeft=Math.max(20, timeStart - (wave-1)*5); const total=timeLeft;
       timer=setInterval(()=>{
         timeLeft-=0.1; bar.style.width=(100*timeLeft/total)+'%';
-        moveChase(0.0009 + (wave-1)*0.0004); // slow drift forward
+        surgeForward(baseDrift()); // constant slow chase forward
         if(timeLeft<=0){ clearInterval(timer); surge('⏳ Time ran out!'); }
       },100);
     }
@@ -265,24 +270,17 @@
       const slots=$('#slots'), chips=$('#chips');
       slots.innerHTML=''; chips.innerHTML='';
 
-      // slots
       current.parts.forEach((p,i)=>{
-        const s=document.createElement('div');
-        s.className='slot'; s.textContent='slot'; s.dataset.index=i;
+        const s=document.createElement('div'); s.className='slot'; s.textContent='slot'; s.dataset.index=i;
         s.ondragover=e=>e.preventDefault();
         s.ondrop=e=>{ e.preventDefault(); const part=e.dataTransfer.getData('text'); s.textContent=part; s.classList.add('filled'); s.dataset.part=part; };
         slots.appendChild(s);
       });
 
-      // chips: include distractors from all parts not in this item
-      const allParts = BANK.flatMap(b=>b.parts);
+      const allParts=BANK.flatMap(b=>b.parts);
       const distractors = shuffle(allParts).filter(x=>!current.parts.includes(x));
       const bank = shuffle(current.parts.concat(distractors.slice(0, Math.max(0, choiceCount-current.parts.length))));
-      bank.forEach(p=>{
-        const c=document.createElement('div');
-        c.className='chip'; c.textContent=p; c.draggable=true; c.ondragstart=e=>e.dataTransfer.setData('text',p);
-        chips.appendChild(c);
-      });
+      bank.forEach(p=>{ const c=document.createElement('div'); c.className='chip'; c.textContent=p; c.draggable=true; c.ondragstart=e=>e.dataTransfer.setData('text',p); chips.appendChild(c); });
 
       $('#toast').textContent='';
       startTimer();
@@ -296,31 +294,22 @@
       const guess=builtWord();
       const ok=(current.accept||[]).includes(guess);
       if(ok){
-        solved++; const bonus=Math.max(0, Math.floor(timeLeft)); score+=100+bonus; repel(0.08);
+        const bonus=Math.max(0, Math.floor(timeLeft));
+        solved++; score+=100+bonus; pushBack(12 + Math.min(18, bonus/4)); // bigger push if faster
         toast(`✅ Correct! +100 (+${bonus})`,'good');
         if(solved%5===0){ wave++; toast(`🧟‍♂️ Wave up! Now Wave ${wave}.`,'good'); }
         updateHUD(); layoutPuzzle();
       } else {
-        surge(`❌ Not quite (${guess}).`);
+        surge('❌ Not quite ('+guess+').');
       }
     }
 
-    function surge(msg){ // wrong answer or timeout: horde surges
-      toast(msg+' Horde surges!','bad'); moveChase(0.18);
-      if(chase>=1){ loseHeart(); } else { layoutPuzzle(); }
-    }
-    function repel(amount){ moveChase(-amount); }
-
-    function moveChase(delta){
-      chase=Math.max(0, Math.min(1, chase+delta));
-      $('#meetPoint').style.left=(100*chase)+'%';
-      if(chase>=1){ loseHeart(); }
-    }
+    function surge(msg){ toast(msg+' Horde surges!','bad'); surgeForward(25); if(distance>0) layoutPuzzle(); }
 
     function loseHeart(){
       hearts--; renderHearts();
       if(hearts<=0){ gameOver(); return; }
-      chase=0.5; toast('💔 The horde caught up! You lost a heart.','warn'); layoutPuzzle();
+      distance=60; toast('💔 The horde caught up! You lost a heart.','warn'); layoutPuzzle();
     }
 
     function gameOver(){
@@ -333,14 +322,11 @@
     }
 
     function toast(t,kind){ const el=$('#toast'); el.textContent=t; el.style.color= kind==='good'? '#78ffb3' : kind==='bad'? '#ff9a9a' : '#ffd166'; }
-    function updateHUD(){ $('#score').textContent=score; $('#wave').textContent=wave; $('#best').textContent=localStorage.getItem(HS_KEY)||0; }
 
     // Controls
     $('#btnStart').onclick=()=>{
-      hearts=3; score=0; solved=0; wave=1; chase=0.5;
-      renderHearts(); updateHUD();
-      refillAllDecks();          // << important: seed decks
-      layoutPuzzle();
+      hearts=3; score=0; solved=0; wave=1; distance=60;
+      renderHearts(); updateHUD(); refillAllDecks(); renderChase(); layoutPuzzle();
     };
     $('#btnNew').onclick=layoutPuzzle;
     $('#btnCheck').onclick=check;
@@ -350,12 +336,7 @@
     // Settings
     $('#timeStart').oninput=e=>{ timeStart=Math.max(20, Math.min(120, +e.target.value||60)); };
     $('#choiceCount').oninput=e=>{ choiceCount=Math.max(4, Math.min(12, +e.target.value||8)); };
-    $('#btnReset').onclick=()=>{
-      hearts=3; score=0; solved=0; wave=1; chase=0.5;
-      renderHearts(); updateHUD();
-      refillAllDecks();          // << important: reseed decks on reset
-      layoutPuzzle();
-    };
+    $('#btnReset').onclick=()=>{ hearts=3; score=0; solved=0; wave=1; distance=60; renderHearts(); updateHUD(); refillAllDecks(); renderChase(); layoutPuzzle(); };
 
     // Export bank (CSV)
     $('#btnExport').onclick=()=>{
@@ -364,8 +345,8 @@
       const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='word-parts-bank.csv'; a.click(); URL.revokeObjectURL(url);
     };
 
-    // Init visuals (don’t start a run yet)
-    renderHearts(); updateHUD();
+    // Init visuals
+    renderHearts(); updateHUD(); renderChase();
   </script>
 </body>
 </html>
