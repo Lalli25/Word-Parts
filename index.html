@@ -3,561 +3,281 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Word Parts Game • Prefixes, Roots & Suffixes</title>
-  <meta name="description" content="A fun 7th-grade friendly game to practice prefixes, roots, and suffixes. Play multiple choice, speed round, or build-a-word.">
+  <title>Word Parts: ZOMBIE SURVIVAL 🧟‍♂️</title>
+  <meta name="description" content="Build‑a‑Word survival: drag prefixes, roots, suffixes to survive zombie waves. 7th‑grade friendly." />
   <style>
     :root{
-      --bg:#0e1320; --card:#141a2a; --muted:#7781a1; --text:#f3f6ff; --brand:#7c9cff; --good:#3ddc97; --bad:#ff6b6b; --warn:#ffd166;
-      --radius:18px;
+      --bg:#0b0f12; --panel:#0f171c; --ink:#eaf4ef; --muted:#9ab5a6; --accent:#78ffb3; --accent2:#9dffea; --danger:#ff6b6b; --warn:#ffd166; --shadow:rgba(0,0,0,.35);
+      --zombie:#8cff7a; --goo:#2e4a3b; --card:#111b20; --outline:#23413a; --radius:18px;
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 600px at 20% -10%, #1b2440 0%, #0e1320 60%), var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial}
-    a{color:var(--brand);text-decoration:none}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1400px 800px at 10% -10%, #0f1b16 0%, #0b0f12 60%), var(--bg);color:var(--ink);font:16px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    a{color:var(--accent)}
     .container{max-width:1100px;margin:0 auto;padding:24px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--brand),#a6b8ff);display:grid;place-items:center;color:#0b0f1a;font-weight:800}
-    h1{font-size:clamp(20px,4vw,28px);margin:0}
+    .logo{width:44px;height:44px;border-radius:12px;background:conic-gradient(from 200deg at 70% 20%, #92ffb7, #36ff9b, #00d37a, #00b16a);display:grid;place-items:center;color:#072015;font-weight:900;box-shadow:0 6px 24px var(--shadow)}
+    h1{margin:0;font-size:clamp(20px,4.5vw,30px)}
+    .tag{color:#bcd3c7;font-size:12px}
 
-    .tabs{display:flex;gap:8px;flex-wrap:wrap}
-    .tab{padding:10px 14px;background:var(--card);border:1px solid #26304a;border-radius:999px;color:var(--muted);cursor:pointer;transition:.15s}
-    .tab.active{color:var(--text);border-color:transparent;background:linear-gradient(135deg, #223157, #1a2440)}
+    .hud{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}
+    @media (max-width:940px){.hud{grid-template-columns:1fr}}
 
-    .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
-    @media (max-width:940px){.wrap{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0));border:1px solid var(--outline);border-radius:var(--radius);padding:18px;box-shadow:0 12px 30px var(--shadow)}
 
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.00));border:1px solid #24304b;border-radius:var(--radius);padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-    .muted{color:var(--muted)}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#182139;border:1px solid #283252;color:#b6c1e4;font-size:12px}
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-    .question{display:grid;gap:12px}
-    .q-text{font-size:clamp(20px,4vw,28px);font-weight:800}
-    .q-sub{font-size:14px;color:#b9c3e8}
-
-    .choices{display:grid;gap:10px;grid-template-columns:1fr 1fr}
-    @media (max-width:720px){.choices{grid-template-columns:1fr}}
-    .choice{padding:12px 14px;border-radius:12px;border:1px solid #283252;background:linear-gradient(180deg,#161e33,#131a2b);cursor:pointer}
-    .choice:hover{transform:translateY(-1px);border-color:#344265}
-    .choice.correct{border-color:var(--good);box-shadow:0 0 0 2px color-mix(in oklab, var(--good) 30%, transparent)}
-    .choice.wrong{border-color:var(--bad);opacity:.85}
-
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-    @media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
-    .stat{padding:12px;border:1px solid #283252;border-radius:14px;background:linear-gradient(180deg,#12192b,#0f1625)}
-    .stat .label{color:#aab6dc;font-size:12px}
-    .stat .value{font-weight:800;font-size:20px}
-
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-    button{appearance:none;padding:10px 14px;border-radius:12px;border:1px solid #2a3553;background:linear-gradient(180deg,#1a2440,#152037);color:var(--text);cursor:pointer}
-    button.primary{background:linear-gradient(135deg,#2b3d6a,#24355b);border-color:#2f3a64}
-    button.good{background:linear-gradient(135deg,#2a6a4e,#1d4d39);border-color:#2b6a4e}
-    button.bad{background:linear-gradient(135deg,#6a2a2a,#4d1d1d);border-color:#6a2a2a}
-
-    .timer{height:10px;background:#1a2034;border:1px solid #283252;border-radius:999px;overflow:hidden}
-    .timer>.bar{height:100%;width:0;background:linear-gradient(90deg,var(--brand),#c6d3ff)}
-
-    .hide{display:none !important}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#0e201a;border:1px solid #204036;color:#bde9d2;font-size:12px}
+    .muted{color:var(--muted)}
     .small{font-size:12px}
 
-    /* Build-a-Word */
-    .chips{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{padding:8px 10px;border-radius:999px;background:#141e36;border:1px solid #283252;cursor:grab}
-    .slots{display:flex;gap:8px;flex-wrap:wrap;min-height:46px;padding:8px;border-radius:12px;border:2px dashed #2a3553;background:#0f1728}
-    .slot{min-width:70px;padding:8px 10px;border-radius:999px;border:1px dashed #3a4668;color:#b6c1e4}
-    .slot.filled{border-style:solid;background:#17203a}
+    .status{display:flex;justify-content:space-between;align-items:center}
+    .hearts{display:flex;gap:8px}
+    .heart{width:22px;height:22px;border-radius:6px;background:radial-gradient(10px 10px at 40% 40%, #ffb0b0, #ff6b6b);box-shadow:0 0 16px rgba(255,107,107,.25)}
+    .heart.dead{background:#2c1a1a;border:1px solid #472b2b;box-shadow:none}
+    .wave{font-weight:800;letter-spacing:.5px}
 
-    footer{margin-top:26px;color:#8d99c7}
-    code.kbd{background:#0d1322;border:1px solid #273356;border-radius:6px;padding:2px 6px}
+    .question{display:grid;gap:6px;margin-top:8px}
+    .q-text{font-size:clamp(22px,4.5vw,30px);font-weight:900}
+
+    .slots{display:flex;gap:8px;flex-wrap:wrap;min-height:46px;padding:10px;border-radius:14px;border:2px dashed #2a4b3e;background:#0d1b15}
+    .slot{min-width:84px;padding:10px 12px;border-radius:999px;border:1px dashed #356554;color:#bfead5;text-align:center}
+    .slot.filled{border-style:solid;background:#12281f}
+
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;background:#12231c;border:1px solid #244736;cursor:grab;transition:.1s}
+    .chip:active{transform:scale(.96)}
+
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{appearance:none;padding:10px 14px;border-radius:12px;border:1px solid #23413a;background:linear-gradient(180deg,#122920,#0f201a);color:var(--ink);cursor:pointer}
+    button.primary{background:linear-gradient(135deg,#1a5a45,#154a38)}
+    button.good{background:linear-gradient(135deg,#2a6a4e,#1d4d39)}
+    button.bad{background:linear-gradient(135deg,#6a2a2a,#4d1d1d)}
+
+    .meter{height:10px;background:#0e1a15;border:1px solid #23413a;border-radius:999px;overflow:hidden}
+    .meter>.bar{height:100%;width:0;background:linear-gradient(90deg,#78ffb3,#9dffea)}
+
+    .toast{margin-top:8px;font-weight:600}
+
+    footer{margin-top:20px;color:#95b5a6}
+    code.kbd{background:#0c1612;border:1px solid #1f3a30;border-radius:6px;padding:2px 6px}
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="brand">
-        <div class="logo">WP</div>
+        <div class="logo">🧟‍♂️</div>
         <div>
-          <h1>Word Parts Game</h1>
-          <div class="muted small">Prefixes • Roots • Suffixes — built for Grades 6–8</div>
+          <h1>Word Parts: Zombie Survival</h1>
+          <div class="tag">Drag prefixes, roots, and suffixes to build the cure before the zombies get you.</div>
         </div>
       </div>
-      <div class="tabs" role="tablist" aria-label="Game modes">
-        <button class="tab active" data-tab="classic" role="tab" aria-selected="true">Classic Quiz</button>
-        <button class="tab" data-tab="speed" role="tab">60‑Second Sprint</button>
-        <button class="tab" data-tab="build" role="tab">Build‑a‑Word</button>
-        <button class="tab" data-tab="custom" role="tab" title="Add your own list">Teacher Tools</button>
+      <div class="row">
+        <span class="pill">Survival Mode</span>
+        <span class="pill">Progression • Easy → Medium → Hard</span>
       </div>
     </header>
 
-    <div class="wrap">
-      <!-- LEFT: Game Panel -->
-      <section class="card" id="panel-classic">
-        <div class="row" style="justify-content:space-between">
-          <span class="pill" id="pill-mode">Classic • Multiple Choice</span>
-          <span class="small muted">High score: <b id="high-classic">0</b></span>
+    <div class="hud">
+      <!-- LEFT: Game -->
+      <section class="card">
+        <div class="status">
+          <div class="row">
+            <span class="pill">Wave <span class="wave" id="wave">1</span></span>
+            <span class="pill">Score: <b id="score">0</b></span>
+            <span class="pill">Best: <b id="best">0</b></span>
+          </div>
+          <div class="hearts" id="hearts"></div>
         </div>
-        <div class="timer" aria-hidden="true"><div class="bar" id="timebar"></div></div>
-        <div class="question" style="margin-top:10px">
-          <div class="q-text" id="qText">Press Start to play!</div>
-          <div class="q-sub" id="qSub"></div>
+
+        <div class="meter" aria-label="time"><div class="bar" id="timebar"></div></div>
+
+        <div class="question">
+          <div class="q-text">Form a word that means: <em id="meaning">“study of life”</em></div>
+          <div class="muted small" id="hint">Hint: root + suffix</div>
         </div>
-        <div class="choices" id="choices"></div>
+
+        <div class="slots" id="slots" aria-label="slots"></div>
+        <div class="chips" id="chips" aria-label="parts to drag"></div>
+
         <div class="controls">
           <button class="primary" id="btnStart">Start</button>
-          <button id="btnSkip" title="Skip (no penalty)">Skip</button>
-          <button id="btnReveal" title="Reveal answer">Reveal</button>
-          <button id="btnNext" class="good">Next</button>
+          <button class="good" id="btnCheck">Check</button>
+          <button id="btnReveal">Reveal</button>
+          <button id="btnNew">New Puzzle</button>
         </div>
+        <div class="toast" id="toast"></div>
       </section>
 
-      <!-- RIGHT: Sidebar: Stats & Settings -->
+      <!-- RIGHT: Info & Settings -->
       <aside class="card">
         <div class="row" style="justify-content:space-between">
-          <div class="pill">Session Stats</div>
-          <div class="small muted">Dataset: <span id="datasetName">Core (60)</span></div>
+          <span class="pill">How it works</span>
+          <span class="small muted">Dataset: <span id="datasetName">Core Pack</span></span>
         </div>
-        <div class="stats" style="margin-top:10px">
-          <div class="stat"><div class="label">Score</div><div class="value" id="statScore">0</div></div>
-          <div class="stat"><div class="label">Streak</div><div class="value" id="statStreak">0</div></div>
-          <div class="stat"><div class="label">Best Streak</div><div class="value" id="statBest">0</div></div>
-          <div class="stat"><div class="label">Accuracy</div><div class="value" id="statAcc">0%</div></div>
+        <ol class="small" style="margin-top:8px;color:#b8d8c8">
+          <li>You begin with <b>3 hearts</b>. Each wrong build costs 1 heart.</li>
+          <li>Clear 5 puzzles to advance a <b>Wave</b>. Higher waves: trickier parts + less time.</li>
+          <li>Score = 100 per correct + bonus for speed streaks.</li>
+          <li>Lose all hearts, the horde gets you. Try to beat your <b>Best</b> score!</li>
+        </ol>
+        <div class="row" style="margin-top:8px">
+          <label class="pill">Starting Time: <input id="timeStart" type="number" min="20" max="120" value="60" style="width:64px;margin-left:6px;background:transparent;border:none;color:#e4ffef"></label>
+          <label class="pill">Choices: <input id="choiceCount" type="number" min="4" max="10" value="7" style="width:54px;margin-left:6px;background:transparent;border:none;color:#e4ffef"></label>
         </div>
-
-        <div style="margin-top:14px" class="muted small">Question Type</div>
-        <div class="row" style="margin-top:6px">
-          <button class="pill" data-type="meaning">"What does it mean?"</button>
-          <button class="pill" data-type="id-part">Identify the part</button>
-          <button class="pill" data-type="example">Choose the best example</button>
+        <div class="row" style="margin-top:8px">
+          <button id="btnReset" class="bad">Reset Run</button>
+          <button id="btnCore" class="pill">Use Core Pack</button>
+          <button id="btnSchool" class="pill" title="Coming soon: paste CSV">Teacher List (CSV soon)</button>
         </div>
-
-        <div style="margin-top:14px" class="muted small">Difficulty</div>
-        <div class="row" style="margin-top:6px">
-          <button class="pill" data-diff="easy">Easy</button>
-          <button class="pill" data-diff="medium">Medium</button>
-          <button class="pill" data-diff="hard">Hard</button>
-          <button class="pill" data-diff="mixed">Mixed</button>
-        </div>
-
-        <div style="margin-top:14px" class="muted small">Round Settings</div>
-        <div class="row" style="margin-top:6px">
-          <label class="pill">Q's per round: <input id="inpCount" type="number" min="5" max="50" value="12" style="width:64px;margin-left:6px;background:transparent;border:none;color:#e4eaff"></label>
-          <label class="pill">Choices: <input id="inpChoices" type="number" min="2" max="6" value="4" style="width:48px;margin-left:6px;background:transparent;border:none;color:#e4eaff"></label>
-        </div>
-
-        <div style="margin-top:14px" class="muted small">Tips</div>
-        <ul class="small" style="margin:6px 0 0 18px; color:#aab6dc">
-          <li>Press <code class="kbd">N</code> for Next, <code class="kbd">S</code> to Skip.</li>
-          <li>Speed mode gives you 60 seconds. Answer fast for bonus points.</li>
-          <li>Use Teacher Tools to load your own list (CSV or paste).</li>
-        </ul>
+        <div class="small muted" style="margin-top:6px">Shortcuts: <code class="kbd">Enter</code> to Check, <code class="kbd">N</code> for New.</div>
       </aside>
     </div>
 
-    <!-- Speed Mode Panel (shares UI) -->
-    <section class="card hide" id="panel-speed" style="margin-top:14px">
-      <div class="row" style="justify-content:space-between">
-        <span class="pill">60‑Second Sprint</span>
-        <span class="small muted">High score: <b id="high-speed">0</b></span>
-      </div>
-      <div class="timer" aria-label="countdown"><div class="bar" id="timebarSpeed"></div></div>
-      <div class="question" style="margin-top:10px">
-        <div class="q-text" id="qTextSpeed">Press Start to sprint!</div>
-        <div class="q-sub" id="qSubSpeed"></div>
-      </div>
-      <div class="choices" id="choicesSpeed"></div>
-      <div class="controls">
-        <button class="primary" id="btnStartSpeed">Start 60s</button>
-        <button id="btnSkipSpeed">Skip</button>
-        <button id="btnRevealSpeed">Reveal</button>
-        <button class="good" id="btnNextSpeed">Next</button>
-      </div>
-    </section>
-
-    <!-- Build-a-Word Panel -->
-    <section class="card hide" id="panel-build" style="margin-top:14px">
-      <div class="row" style="justify-content:space-between">
-        <span class="pill">Build‑a‑Word</span>
-        <span class="small muted">Drag prefixes, roots, suffixes into slots</span>
-      </div>
-      <div class="question" style="margin-top:10px">
-        <div class="q-text" id="buildPrompt">Form a word that means: <em id="buildMeaning">"not friendly"</em></div>
-        <div class="q-sub" id="buildHint">Hint: prefix + root</div>
-      </div>
-      <div class="slots" id="buildSlots" aria-label="slots"></div>
-      <div class="chips" id="buildChips" aria-label="parts to drag"></div>
-      <div class="controls">
-        <button class="primary" id="btnBuildNew">New Puzzle</button>
-        <button class="good" id="btnBuildCheck">Check</button>
-        <button id="btnBuildReveal">Reveal</button>
-      </div>
-      <div class="small muted" id="buildResult" style="margin-top:6px"></div>
-    </section>
-
-    <!-- Teacher Tools -->
-    <section class="card hide" id="panel-custom" style="margin-top:14px">
-      <div class="row" style="justify-content:space-between">
-        <span class="pill">Teacher Tools</span>
-        <span class="small muted">Paste CSV or edit items. Then click <b>Load Custom List</b>.</span>
-      </div>
-      <details style="margin-top:8px">
-        <summary class="small">How to format (click to expand)</summary>
-        <p class="small muted">Use CSV rows with <b>part,type,meaning,examples,difficulty</b>.<br>Types: <code>prefix</code>, <code>root</code>, <code>suffix</code>. Difficulty: <code>easy</code>/<code>medium</code>/<code>hard</code>.<br>Examples separated by <code>|</code>.</p>
-        <pre class="small" style="white-space:pre-wrap;background:#0d1322;border:1px solid #273356;padding:10px;border-radius:10px">un,prefix,not or opposite of,unfair|unfriendly,easy
-tele,prefix,far; at a distance,telegraph|telephone,medium
-tract,root,pull or draw,tractor|attract,medium
-ology,suffix,study of,biology|geology,easy</pre>
-      </details>
-      <textarea id="customInput" rows="10" style="width:100%;margin-top:10px;background:#0f1627;color:#e9efff;border:1px solid #273356;border-radius:12px;padding:10px" placeholder="Paste CSV here..."></textarea>
-      <div class="controls">
-        <button class="primary" id="btnLoadCustom">Load Custom List</button>
-        <button id="btnExport">Export Current List (CSV)</button>
-        <button class="bad" id="btnReset">Reset to Core List</button>
-      </div>
-      <div class="small muted" id="customStatus" style="margin-top:6px"></div>
-    </section>
-
-    <footer class="small">
-      Made for students by teachers • Works offline • Save to GitHub Pages as a single HTML file.
-    </footer>
+    <footer class="small">Single‑file — drop into GitHub Pages as <code>index.html</code>. Works offline.</footer>
   </div>
 
   <script>
-    /*********************************
-     * Core dataset (60+ items)
-     *********************************/
-    const CORE = [
-      // easy
-      ['un','prefix','not; opposite of',['unfair','unfriendly'],'easy'],
-      ['re','prefix','again',['rewrite','redo'],'easy'],
-      ['pre','prefix','before',['preview','preheat'],'easy'],
-      ['mis','prefix','wrongly',['misplace','misread'],'easy'],
-      ['dis','prefix','not; apart',['disagree','disconnect'],'easy'],
-      ['non','prefix','not',['nonsense','nonstick'],'easy'],
-      ['anti','prefix','against',['antifreeze','antivirus'],'easy'],
-      ['auto','prefix','self',['autograph','autopilot'],'easy'],
-      ['bio','root','life',['biology','biography'],'easy'],
-      ['geo','root','earth',['geology','geography'],'easy'],
-      ['tele','prefix','far; at a distance',['telephone','teleport'],'easy'],
-      ['micro','prefix','small',['microscope','microchip'],'easy'],
-      ['macro','prefix','large',['macrostructure','macroeconomics'],'easy'],
-      ['graph','root','write; draw',['autograph','telegraph'],'easy'],
-      ['photo','root','light',['photograph','photosynthesis'],'easy'],
-      ['port','root','carry',['transport','import'],'easy'],
-      ['spect','root','look',['inspect','spectator'],'easy'],
-      ['aud','root','hear',['audio','audience'],'easy'],
-      ['vis','root','see',['visible','vision'],'easy'],
-      ['form','root','shape',['transform','reformat'],'easy'],
-      ['-ful','suffix','full of',['helpful','joyful'],'easy'],
-      ['-less','suffix','without',['hopeless','fearless'],'easy'],
-      ['-ness','suffix','state or quality',['kindness','darkness'],'easy'],
-      ['-able','suffix','capable of',['readable','breakable'],'easy'],
-      ['-er','suffix','one who',['teacher','runner'],'easy'],
+    /*****************************************
+     * ZOMBIE SURVIVAL – Build‑a‑Word Only
+     *****************************************/
+    const HS_KEY='hs_zombie';
 
-      // medium
-      ['intra','prefix','within',['intramural','intravenous'],'medium'],
-      ['inter','prefix','between',['international','interact'],'medium'],
-      ['sub','prefix','under',['submarine','subway'],'medium'],
-      ['super','prefix','above; beyond',['superhuman','supercharge'],'medium'],
-      ['trans','prefix','across; through',['transport','transmit'],'medium'],
-      ['rupt','root','break',['interrupt','rupture'],'medium'],
-      ['scrib','root','write',['describe','scribble'],'medium'],
-      ['ject','root','throw',['eject','project'],'medium'],
-      ['dict','root','say; speak',['predict','dictionary'],'medium'],
-      ['cred','root','believe',['credible','credit'],'medium'],
-      ['terra','root','earth',['terrain','terrarium'],'medium'],
-      ['chrono','root','time',['chronology','synchronize'],'medium'],
-      ['meter','root','measure',['thermometer','speedometer'],'medium'],
-      ['-ology','suffix','study of',['biology','geology'],'medium'],
-      ['-ist','suffix','one who practices',['artist','scientist'],'medium'],
-      ['-tion','suffix','act or state',['action','celebration'],'medium'],
-      ['-ment','suffix','result or act of',['payment','enjoyment'],'medium'],
-      ['-ive','suffix','tending to',['active','creative'],'medium'],
+    // Bank of buildable words (2–3 parts). Each item:
+    // {parts:[...], types:[...], meaning:'', hint:'', accept:[...], diff:'easy|medium|hard'}
+    const BANK = [
+      // EASY
+      {parts:['bio','logy'], types:['root','suffix'], meaning:'study of life', hint:'root + suffix', accept:['biology'], diff:'easy'},
+      {parts:['geo','logy'], types:['root','suffix'], meaning:'study of earth', hint:'root + suffix', accept:['geology'], diff:'easy'},
+      {parts:['tele','graph'], types:['prefix','root'], meaning:'writing from far away', hint:'prefix + root', accept:['telegraph'], diff:'easy'},
+      {parts:['micro','scope'], types:['prefix','root'], meaning:'device to see small things', hint:'prefix + root', accept:['microscope'], diff:'easy'},
+      {parts:['trans','port'], types:['prefix','root'], meaning:'carry across', hint:'prefix + root', accept:['transport'], diff:'easy'},
+      {parts:['aud','ible'], types:['root','suffix'], meaning:'able to be heard', hint:'root + suffix', accept:['audible'], diff:'easy'},
+      {parts:['vis','ible'], types:['root','suffix'], meaning:'able to be seen', hint:'root + suffix', accept:['visible'], diff:'easy'},
+      {parts:['photo','graph'], types:['root','root'], meaning:'picture made with light', hint:'root + root', accept:['photograph'], diff:'easy'},
+      {parts:['re','write'], types:['prefix','root'], meaning:'write again', hint:'prefix + root', accept:['rewrite'], diff:'easy'},
+      {parts:['un','friendly'], types:['prefix','root'], meaning:'not friendly', hint:'prefix + root', accept:['unfriendly','un-friendl y','un-f riendly'].map(s=>s.replace(/\s/g,'')), diff:'easy'},
 
-      // hard
-      ['bene','root','good; well',['benevolent','benefit'],'hard'],
-      ['mal','root','bad; evil',['malfunction','malicious'],'hard'],
-      ['hypo','prefix','under; below normal',['hypothermia','hypodermic'],'hard'],
-      ['hyper','prefix','over; excessive',['hyperactive','hypertension'],'hard'],
-      ['pseudo','prefix','false',['pseudonym','pseudoscience'],'hard'],
-      ['mono','prefix','one',['monologue','monotone'],'hard'],
-      ['poly','prefix','many',['polygon','polytheism'],'hard'],
-      ['therm','root','heat',['thermostat','thermal'],'hard'],
-      ['phobia','root','fear',['arachnophobia','claustrophobia'],'hard'],
-      ['rupt','root','break (advanced)',['bankrupt','corrupt'],'hard'],
-      ['tact','root','touch',['contact','tactile'],'hard'],
-      ['mit','root','send',['transmit','permit'],'hard'],
-      ['logy','suffix','study of (alt.)',['mythology','anthology'],'hard'],
-      ['ist','suffix','one who (alt.)',['pianist','biologist'],'hard'],
-      ['osis','suffix','condition; process',['osmosis','halitosis'],'hard'],
-      ['itis','suffix','inflammation',['bronchitis','arthritis'],'hard'],
-      ['ize','suffix','to make; to become',['modernize','prioritize'],'hard'],
+      // MEDIUM
+      {parts:['inter','act'], types:['prefix','root'], meaning:'act between or with others', hint:'prefix + root', accept:['interact'], diff:'medium'},
+      {parts:['sub','marine'], types:['prefix','root'], meaning:'under water', hint:'prefix + root', accept:['submarine'], diff:'medium'},
+      {parts:['super','human'], types:['prefix','root'], meaning:'beyond human', hint:'prefix + root', accept:['superhuman'], diff:'medium'},
+      {parts:['rupt','ure'], types:['root','suffix'], meaning:'the act of breaking', hint:'root + suffix', accept:['rupture'], diff:'medium'},
+      {parts:['dict','ion'], types:['root','suffix'], meaning:'the act or style of speaking', hint:'root + suffix', accept:['diction'], diff:'medium'},
+      {parts:['cred','ible'], types:['root','suffix'], meaning:'believable', hint:'root + suffix', accept:['credible'], diff:'medium'},
+      {parts:['chrono','logy'], types:['root','suffix'], meaning:'order of time', hint:'root + suffix', accept:['chronology'], diff:'medium'},
+      {parts:['meter','stick'], types:['root','root'], meaning:'tool used to measure', hint:'root + root', accept:['meterstick','meter-stick'], diff:'medium'},
+      {parts:['port','able'], types:['root','suffix'], meaning:'able to be carried', hint:'root + suffix', accept:['portable'], diff:'medium'},
+      {parts:['scrib','er'], types:['root','suffix'], meaning:'one who writes', hint:'root + suffix', accept:['scriber'], diff:'medium'},
+
+      // HARD
+      {parts:['bene','fit'], types:['root','suffix'], meaning:'good result', hint:'root + suffix', accept:['benefit'], diff:'hard'},
+      {parts:['mal','function'], types:['root','root'], meaning:'bad working', hint:'root + root', accept:['malfunction'], diff:'hard'},
+      {parts:['hyper','active'], types:['prefix','suffix'], meaning:'excessively active', hint:'prefix + suffix', accept:['hyperactive'], diff:'hard'},
+      {parts:['pseudo','science'], types:['prefix','root'], meaning:'false science', hint:'prefix + root', accept:['pseudoscience'], diff:'hard'},
+      {parts:['poly','gon'], types:['prefix','suffix'], meaning:'shape with many angles', hint:'prefix + suffix', accept:['polygon'], diff:'hard'},
+      {parts:['tact','ile'], types:['root','suffix'], meaning:'related to touch', hint:'root + suffix', accept:['tactile'], diff:'hard'},
+      {parts:['therm','al'], types:['root','suffix'], meaning:'related to heat', hint:'root + suffix', accept:['thermal'], diff:'hard'},
+      {parts:['phobia','free'], types:['root','suffix'], meaning:'without fear (playful)', hint:'root + suffix', accept:['phobiafree','phobia-free'], diff:'hard'},
+      {parts:['mit','ten'], types:['root','suffix'], meaning:'(punny) something you send to your hand', hint:'root + suffix', accept:['mitten'], diff:'hard'},
     ];
 
-    // Global state
-    let DATA = [...CORE];
-    let settings = {
-      type:'meaning', // meaning | id-part | example
-      diff:'mixed',   // easy | medium | hard | mixed
-      count:12,
-      choices:4,
-    };
+    // State
+    let hearts=3, score=0, solved=0, wave=1; // solved resets each wave
+    let timeStart=60, timeLeft=60, timer=null;
+    let choiceCount=7; // number of chips shown
+    let current=null; // puzzle object
 
-    // Utility helpers
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const sample = (arr,n=1)=>{
-      const copy=[...arr];
-      const out=[]; n=Math.min(n,copy.length);
-      for(let i=0;i<n;i++){ out.push(copy.splice(Math.floor(Math.random()*copy.length),1)[0]); }
-      return out;
-    };
-    const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
-    const byDiff = (d)=> d==='mixed'? DATA : DATA.filter(x=>x[4]===d);
+    const $ = s=>document.querySelector(s);
+    const $$ = s=>Array.from(document.querySelectorAll(s));
+    const shuffle = arr => arr.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
 
-    const hs = {get:(k)=> +localStorage.getItem(k) || 0, set:(k,v)=>localStorage.setItem(k,v)};
-
-    // Stats
-    const S = {score:0, correct:0, total:0, streak:0, best:0};
-    const updateStats = ()=>{
-      $('#statScore').textContent=S.score;
-      $('#statStreak').textContent=S.streak;
-      $('#statBest').textContent=S.best;
-      const acc = S.total? Math.round(100*S.correct/S.total) : 0;
-      $('#statAcc').textContent=acc+'%';
-    };
-
-    /************** Classic Quiz **************/
-    let round = [];
-    let idx = -1; // current question index
-    let answerKey = '';
-
-    function makeQuestion(item){
-      const [part,type,meaning,examples] = item;
-      const mode = settings.type;
-      let prompt, sub, correct, pool, choices=[];
-
-      if(mode==='meaning'){
-        prompt = `${type==='prefix'?part+'‑': type==='suffix'?'‑'+part: part}`;
-        sub = 'What does this '+type+' mean?';
-        correct = meaning;
-        pool = byDiff(settings.diff).filter(x=>x!==item).map(x=>x[2]);
-      } else if(mode==='id-part'){
-        prompt = `${meaning}`;
-        sub = 'Which word part matches this meaning?';
-        correct = part + (type==='prefix'?'‑': type==='suffix'?'': '');
-        pool = byDiff(settings.diff).filter(x=>x!==item).map(x=>x[0] + (x[1]==='prefix'?'‑': x[1]==='suffix'?'': ''));
-      } else { // example mode
-        const ex = sample(examples,1)[0];
-        prompt = `Which meaning best matches the word part in <b>${ex}</b>?`;
-        sub = 'Focus on the part highlighted by the example word.';
-        correct = meaning;
-        pool = byDiff(settings.diff).filter(x=>x!==item).map(x=>x[2]);
+    function renderHearts(){
+      const box=$('#hearts'); box.innerHTML='';
+      for(let i=0;i<3;i++){
+        const d=document.createElement('div'); d.className='heart'+(i<hearts?'':' dead'); box.appendChild(d);
       }
-      choices = shuffle([correct, ...sample(pool, settings.choices-1)]);
-      return {prompt, sub, correct, choices};
     }
 
-    function renderQ(){
-      const q = round[idx];
-      const {prompt, sub, correct, choices} = makeQuestion(q);
-      answerKey = correct;
-      $('#qText').innerHTML = prompt;
-      $('#qSub').textContent = sub;
-      const c = $('#choices');
-      c.innerHTML = '';
-      choices.forEach(txt=>{
-        const btn = document.createElement('button');
-        btn.className='choice'; btn.innerHTML=txt;
-        btn.onclick=()=>selectChoice(btn, txt);
-        c.appendChild(btn);
-      });
+    function pickPool(){
+      const diff = wave<=2? 'easy' : wave<=4? 'medium' : 'hard';
+      const pool = BANK.filter(x=>x.diff===diff);
+      return pool[Math.floor(Math.random()*pool.length)];
     }
 
-    function selectChoice(el, txt){
-      const correct = txt===answerKey;
-      S.total++;
-      if(correct){
-        S.score+=100; S.correct++; S.streak++; S.best=Math.max(S.best,S.streak);
-        el.classList.add('correct');
-      } else {
-        S.score=Math.max(0,S.score-25); S.streak=0; el.classList.add('wrong');
-        // highlight the correct one
-        $$('#choices .choice').find(b=>b.innerHTML===answerKey)?.classList.add('correct');
-      }
-      updateStats();
+    function startTimer(){
+      clearInterval(timer);
+      const bar=$('#timebar'); timeLeft=timeStart - (wave-1)*5; if(timeLeft<25) timeLeft=25; const total=timeLeft;
+      timer=setInterval(()=>{ timeLeft-=0.1; bar.style.width=(100*timeLeft/total)+'%'; if(timeLeft<=0){ clearInterval(timer); loseHeart('⏳ Time ran out!'); } },100);
     }
 
-    function startRound(){
-      S.score=0; S.correct=0; S.total=0; S.streak=0; updateStats();
-      const pool = byDiff(settings.diff);
-      round = sample(pool, Math.min(settings.count, pool.length));
-      idx = 0; renderQ();
-    }
-
-    // Controls
-    $('#btnStart').onclick = startRound;
-    $('#btnNext').onclick = ()=>{ if(idx<round.length-1){ idx++; renderQ(); } };
-    $('#btnSkip').onclick = ()=>{ if(idx<round.length-1){ idx++; renderQ(); } };
-    $('#btnReveal').onclick = ()=>{
-      $$('#choices .choice').forEach(b=>{ if(b.innerHTML===answerKey) b.classList.add('correct'); });
-    };
-
-    // Settings controls
-    $$('#panel-classic .pill[data-type]').forEach(p=>p.onclick=()=>{ settings.type=p.dataset.type; $$('#panel-classic .pill[data-type]').forEach(x=>x.classList.remove('active')); p.classList.add('active'); });
-    $$('#panel-classic .pill[data-diff]').forEach(p=>p.onclick=()=>{ settings.diff=p.dataset.diff; $$('#panel-classic .pill[data-diff]').forEach(x=>x.classList.remove('active')); p.classList.add('active'); });
-    $('#inpCount').oninput=e=> settings.count = Math.max(5, Math.min(50, +e.target.value||12));
-    $('#inpChoices').oninput=e=> settings.choices = Math.max(2, Math.min(6, +e.target.value||4));
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e)=>{
-      if(e.key.toLowerCase()==='n'){ $('#btnNext').click(); }
-      if(e.key.toLowerCase()==='s'){ $('#btnSkip').click(); }
-    });
-
-    /************** Speed Mode **************/
-    let speedTimer=null, speedTime=60, speedLeft=60, speedAnswer='';
-    function newSpeedQ(){
-      const item = sample(byDiff(settings.diff),1)[0];
-      const {prompt, sub, correct, choices} = makeQuestion(item);
-      speedAnswer = correct;
-      $('#qTextSpeed').innerHTML=prompt; $('#qSubSpeed').textContent=sub;
-      const box = $('#choicesSpeed'); box.innerHTML='';
-      choices.forEach(t=>{
-        const b=document.createElement('button'); b.className='choice'; b.innerHTML=t;
-        b.onclick=()=>{ if(t===speedAnswer){ S.score+=100; S.correct++; S.total++; S.streak++; S.best=Math.max(S.best,S.streak);} else {S.score=Math.max(0,S.score-25); S.total++; S.streak=0;} updateStats(); newSpeedQ(); };
-        box.appendChild(b);
-      });
-    }
-    function startSpeed(){
-      S.score=0; S.correct=0; S.total=0; S.streak=0; updateStats();
-      speedLeft = speedTime;
-      newSpeedQ();
-      const bar=$('#timebarSpeed');
-      clearInterval(speedTimer);
-      speedTimer = setInterval(()=>{
-        speedLeft-=0.1; bar.style.width = (100*speedLeft/speedTime)+'%';
-        if(speedLeft<=0){ clearInterval(speedTimer); bar.style.width='0%';
-          // end
-          $('#qTextSpeed').innerHTML = `Time! You scored <b>${S.score}</b> with ${S.correct}/${S.total} correct.`;
-          $('#choicesSpeed').innerHTML='';
-          const hsKey='hs_speed'; const prev=hs.get(hsKey); if(S.score>prev){ hs.set(hsKey,S.score); } updateHighs();
-        }
-      },100);
-    }
-    $('#btnStartSpeed').onclick=startSpeed;
-    $('#btnNextSpeed').onclick=newSpeedQ;
-    $('#btnSkipSpeed').onclick=newSpeedQ;
-    $('#btnRevealSpeed').onclick=()=>{
-      $$('#choicesSpeed .choice').forEach(b=>{ if(b.innerHTML===speedAnswer) b.classList.add('correct'); });
-    };
-
-    function updateHighs(){
-      $('#high-classic').textContent = hs.get('hs_classic');
-      $('#high-speed').textContent = hs.get('hs_speed');
-    }
-    updateHighs();
-
-    /************** Build‑a‑Word **************/
-    const BUILD_BANK = [
-      {parts:['un','amic'], types:['prefix','root'], meaning:'not friendly', word:'unamicable', hint:'prefix + root', accept:['unamicable','un-amicable','unamic']},
-      {parts:['tele','graph'], types:['prefix','root'], meaning:'writing from far away', word:'telegraph', hint:'prefix + root', accept:['telegraph']},
-      {parts:['bio','logy'], types:['root','suffix'], meaning:'study of life', word:'biology', hint:'root + suffix', accept:['biology']},
-      {parts:['trans','port'], types:['prefix','root'], meaning:'carry across', word:'transport', hint:'prefix + root', accept:['transport']},
-      {parts:['micro','scope'], types:['prefix','root'], meaning:'device to see small things', word:'microscope', hint:'prefix + root', accept:['microscope']},
-      {parts:['aud','ible'], types:['root','suffix'], meaning:'able to be heard', word:'audible', hint:'root + suffix', accept:['audible']},
-    ];
-
-    function newBuild(){
-      const item = sample(BUILD_BANK,1)[0];
-      $('#buildMeaning').textContent='"'+item.meaning+'"';
-      $('#buildHint').textContent=item.hint;
-      const slots=$('#buildSlots'); const chips=$('#buildChips');
+    function newPuzzle(){
+      current = pickPool();
+      $('#meaning').textContent='"'+current.meaning+'"';
+      $('#hint').textContent=current.hint;
+      const slots=$('#slots'); const chips=$('#chips');
       slots.innerHTML=''; chips.innerHTML='';
-      item.parts.forEach((p,i)=>{
-        const s=document.createElement('div'); s.className='slot'; s.textContent='slot'; s.dataset.index=i; s.ondragover=(e)=>e.preventDefault(); s.ondrop=(e)=>{ e.preventDefault(); const part=e.dataTransfer.getData('text'); s.textContent=part; s.classList.add('filled'); s.dataset.part=part; };
+
+      current.parts.forEach((p,i)=>{
+        const s=document.createElement('div'); s.className='slot'; s.textContent='slot'; s.dataset.index=i; s.ondragover=e=>e.preventDefault(); s.ondrop=e=>{ e.preventDefault(); const part=e.dataTransfer.getData('text'); s.textContent=part; s.classList.add('filled'); s.dataset.part=part; };
         slots.appendChild(s);
       });
-      shuffle(item.parts.concat(sample(DATA.map(x=>x[0]).filter(p=>!item.parts.includes(p)),3))).forEach(p=>{
-        const c=document.createElement('div'); c.className='chip'; c.textContent=p; c.draggable=true; c.ondragstart=(e)=>{ e.dataTransfer.setData('text', p); };
-        chips.appendChild(c);
-      });
-      $('#buildResult').textContent='';
-      $('#buildResult').style.color='';
-      $('#buildResult').dataset.answer=item.word;
-      $('#buildResult').dataset.accept=JSON.stringify(item.accept);
+
+      const distractors = shuffle(BANK.flatMap(b=>b.parts)).filter(x=>!current.parts.includes(x));
+      const bank = shuffle(current.parts.concat(distractors.slice(0, Math.max(0, choiceCount-current.parts.length))));
+      bank.forEach(p=>{ const c=document.createElement('div'); c.className='chip'; c.textContent=p; c.draggable=true; c.ondragstart=e=>e.dataTransfer.setData('text',p); chips.appendChild(c); });
+
+      $('#toast').textContent='';
+      startTimer();
     }
 
-    function checkBuild(){
-      const slots=$$('#buildSlots .slot');
-      const built=slots.map(s=>s.dataset.part||'').join('');
-      const accept=JSON.parse($('#buildResult').dataset.accept||'[]');
-      if(!built || slots.some(s=>!s.dataset.part)){
-        $('#buildResult').textContent='Fill all slots, then Check!';
-        $('#buildResult').style.color='var(--warn)';
-        return;
-      }
-      if(accept.includes(built)){
-        $('#buildResult').innerHTML=`✅ Nice! <b>${built}</b> is correct.`;
-        $('#buildResult').style.color='var(--good)';
-      } else {
-        $('#buildResult').innerHTML=`❌ Not quite. You made <b>${built}</b>.`;
-        $('#buildResult').style.color='var(--bad)';
-      }
+    function builtWord(){ return $$('#slots .slot').map(s=>s.dataset.part||'').join(''); }
+
+    function check(){
+      const slots=$$('#slots .slot');
+      if(slots.some(s=>!s.dataset.part)){ toast('Fill all slots first.', 'warn'); return; }
+      const guess=builtWord();
+      const ok=(current.accept||[]).includes(guess);
+      if(ok){
+        solved++; score+=100 + Math.max(0, Math.floor(timeLeft));
+        toast('✅ Correct! +100', 'good');
+        if(solved%5===0){ wave++; toast(`🧟‍♂️ Wave up! Now Wave ${wave}.`, 'good'); }
+        updateHUD(); newPuzzle();
+      } else { loseHeart(`❌ Not quite (${guess}).`); }
     }
 
-    $('#btnBuildNew').onclick=newBuild;
-    $('#btnBuildCheck').onclick=checkBuild;
-    $('#btnBuildReveal').onclick=()=>{
-      const ans=$('#buildResult').dataset.answer; $('#buildResult').innerHTML=`💡 Answer: <b>${ans}</b>`; $('#buildResult').style.color='var(--brand)';
-    };
-    newBuild();
+    function loseHeart(msg){ hearts--; toast(msg+' -1 ❤️', 'bad'); renderHearts(); if(hearts<=0){ gameOver(); } else { newPuzzle(); } }
 
-    /************** Teacher Tools **************/
-    function parseCSV(text){
-      const rows=text.trim().split(/\n+/).map(r=>r.split(',').map(x=>x.trim()));
-      const out=[];
-      for(const r of rows){
-        if(r.length<5) continue;
-        const [part,type,meaning,examples,difficulty]=r;
-        out.push([part,type,meaning,examples.split('|'),difficulty]);
-      }
-      return out;
+    function gameOver(){
+      clearInterval(timer);
+      const prev=+localStorage.getItem(HS_KEY)||0; if(score>prev) localStorage.setItem(HS_KEY,String(score));
+      updateHUD();
+      $('#chips').innerHTML=''; $('#slots').innerHTML='';
+      $('#meaning').textContent='“Game Over”'; $('#hint').textContent='The horde got you. Press Start to try again.';
+      toast(`FINAL SCORE: ${score} • Best: ${localStorage.getItem(HS_KEY)||score}`, 'warn');
     }
 
-    $('#btnLoadCustom').onclick=()=>{
-      const t=$('#customInput').value; if(!t.trim()){ $('#customStatus').textContent='Paste CSV first.'; return; }
-      try{
-        const parsed=parseCSV(t);
-        if(!parsed.length) throw new Error('No rows.');
-        DATA=parsed; $('#datasetName').textContent=`Custom (${DATA.length})`;
-        $('#customStatus').textContent=`Loaded ${DATA.length} items.`;
-      }catch(err){ $('#customStatus').textContent='Error: '+err.message; }
-    };
-    $('#btnExport').onclick=()=>{
-      const rows=DATA.map(([p,t,m,e,d])=>[p,t,m,(e||[]).join('|'),d].join(','));
-      const blob=new Blob([rows.join('\n')],{type:'text/csv'});
-      const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='word-parts-list.csv'; a.click(); URL.revokeObjectURL(url);
-    };
-    $('#btnReset').onclick=()=>{ DATA=[...CORE]; $('#datasetName').textContent=`Core (${DATA.length})`; $('#customStatus').textContent='Reset to core list.'; };
+    function toast(t,kind){ const el=$('#toast'); el.textContent=t; el.style.color = kind==='good'? '#78ffb3' : kind==='bad'? '#ff9a9a' : '#ffd166'; }
 
-    /************** Tabs **************/
-    const panels={classic:'#panel-classic', speed:'#panel-speed', build:'#panel-build', custom:'#panel-custom'};
-    $$('.tab').forEach(t=>t.onclick=()=>{
-      $$('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
-      Object.values(panels).forEach(sel=>$(sel).classList.add('hide'));
-      $(panels[t.dataset.tab]).classList.remove('hide');
-      $('#pill-mode').textContent = t.dataset.tab==='classic' ? 'Classic • Multiple Choice' : (t.dataset.tab==='speed'?'60‑Second Sprint': t.dataset.tab==='build'?'Build‑a‑Word':'Teacher Tools');
-    });
+    function updateHUD(){ $('#score').textContent=score; $('#wave').textContent=wave; $('#best').textContent=localStorage.getItem(HS_KEY)||0; }
 
-    /************** Persist highs on classic end **************/
-    // Whenever the player moves past the final question, capture high score.
-    $('#btnNext').addEventListener('click', ()=>{
-      if(idx===round.length-1){ const prev=hs.get('hs_classic'); if(S.score>prev){ hs.set('hs_classic',S.score); updateHighs(); } }
-    });
+    // Controls
+    $('#btnStart').onclick=()=>{ hearts=3; score=0; solved=0; wave=1; renderHearts(); updateHUD(); newPuzzle(); };
+    $('#btnNew').onclick=newPuzzle;
+    $('#btnCheck').onclick=check;
+    $('#btnReveal').onclick=()=>{ toast('💡 Answer: '+(current.accept?.[0]||''), 'warn'); };
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Enter') check(); if(e.key.toLowerCase()==='n') newPuzzle(); });
 
-    // Initial UI state
-    $$('#panel-classic .pill[data-type]')[0].classList.add('active');
-    $$('#panel-classic .pill[data-diff]').find(p=>p.dataset.diff==='mixed').classList.add('active');
+    // Settings
+    $('#timeStart').oninput=e=>{ timeStart=Math.max(20, Math.min(120, +e.target.value||60)); };
+    $('#choiceCount').oninput=e=>{ choiceCount=Math.max(4, Math.min(10, +e.target.value||7)); };
+    $('#btnReset').onclick=()=>{ hearts=3; score=0; solved=0; wave=1; renderHearts(); updateHUD(); newPuzzle(); };
+    $('#btnCore').onclick=()=>toast('Core Pack loaded.','good');
+
+    // Init
+    renderHearts(); updateHUD();
   </script>
 </body>
 </html>
